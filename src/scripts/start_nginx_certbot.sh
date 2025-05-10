@@ -1,5 +1,9 @@
 #!/bin/bash
 
+ip a
+
+printenv
+
 # Helper function to gracefully shut down our child processes when we exit.
 clean_exit() {
     for PID in "${NGINX_PID}" "${CERTBOT_LOOP_PID}"; do
@@ -19,7 +23,10 @@ trap "exit" TERM INT QUIT
 trap "clean_exit" EXIT
 
 # Source "util.sh" so we can have our nice tools.
-. "$(cd "$(dirname "$0")"; pwd)/util.sh"
+. "$(
+    cd "$(dirname "$0")"
+    pwd
+)/util.sh"
 
 # If the environment variable `DEBUG=1` is set, then this message is printed.
 debug "Debug messages are enabled"
@@ -51,31 +58,41 @@ fi
 # Instead of trying to run 'cron' or something like that, just sleep and
 # call on certbot after the defined interval.
 (
-set -e
-while true; do
-    info "Running the autorenewal service"
+    set -e
+    while true; do
+        info "Running the autorenewal service"
 
-    # Create symlinks from conf.d/ to user_conf.d/ if necessary.
-    symlink_user_configs
+        # Create symlinks from conf.d/ to user_conf.d/ if necessary.
+        symlink_user_configs
 
-    # Check that all dhparam files exists.
-    "$(cd "$(dirname "$0")"; pwd)/create_dhparams.sh"
+        # Check that all dhparam files exists.
+        "$(
+            cd "$(dirname "$0")"
+            pwd
+        )/create_dhparams.sh"
 
-    if [ 1 = "${USE_LOCAL_CA}" ]; then
-        # Renew all certificates with the help of the local CA.
-        "$(cd "$(dirname "$0")"; pwd)/run_local_ca.sh"
-    else
-        # Run certbot to check if any certificates needs renewal.
-        "$(cd "$(dirname "$0")"; pwd)/run_certbot.sh"
-    fi
+        if [ 1 = "${USE_LOCAL_CA}" ]; then
+            # Renew all certificates with the help of the local CA.
+            "$(
+                cd "$(dirname "$0")"
+                pwd
+            )/run_local_ca.sh"
+        else
+            # Run certbot to check if any certificates needs renewal.
+            "$(
+                cd "$(dirname "$0")"
+                pwd
+            )/run_certbot.sh"
+        fi
 
-    # Finally we sleep for the defined time interval before checking the
-    # certificates again.
-    # The "if" statement afterwards is to enable us to terminate this sleep
-    # process (via the HUP trap) without tripping the "set -e" setting.
-    info "Autorenewal service will now sleep ${RENEWAL_INTERVAL}"
-    sleep "${RENEWAL_INTERVAL}" || x=$?; if [ -n "${x}" ] && [ "${x}" -ne "143" ]; then exit "${x}"; fi
-done
+        # Finally we sleep for the defined time interval before checking the
+        # certificates again.
+        # The "if" statement afterwards is to enable us to terminate this sleep
+        # process (via the HUP trap) without tripping the "set -e" setting.
+        info "Autorenewal service will now sleep ${RENEWAL_INTERVAL}"
+        sleep "${RENEWAL_INTERVAL}" || x=$?
+        if [ -n "${x}" ] && [ "${x}" -ne "143" ]; then exit "${x}"; fi
+    done
 ) &
 CERTBOT_LOOP_PID=$!
 debug "PID of the autorenewal loop: ${CERTBOT_LOOP_PID}"
