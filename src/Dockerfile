@@ -1,5 +1,4 @@
-FROM nginx:1.27.5
-LABEL maintainer="Jonas Alfredsson <jonas.alfredsson@protonmail.com>"
+FROM nginx:stable
 
 ENV CERTBOT_DNS_AUTHENTICATORS="\
     cloudflare \
