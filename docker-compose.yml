@@ -8,14 +8,24 @@ services:
     restart: unless-stopped
     environment:
       - CERTBOT_EMAIL=${CERTBOT_EMAIL}
-    env_file:
-      - ./nginx-certbot.env
+      # Optional (Defaults)
+      - DHPARAM_SIZE=${DHPARAM_SIZE}
+      - ELLIPTIC_CURVE=${ELLIPTIC_CURVE}
+      - RENEWAL_INTERVAL=${RENEWAL_INTERVAL}
+      - RSA_KEY_SIZE=${RSA_KEY_SIZE}
+      - STAGING=${STAGING}
+      - USE_ECDSA=${USE_ECDSA}
+      # Advanced (Defaults)
+      - CERTBOT_AUTHENTICATOR=${CERTBOT_AUTHENTICATOR}
+      - CERTBOT_DNS_PROPAGATION_SECONDS=${CERTBOT_DNS_PROPAGATION_SECONDS}
+      - DEBUG=${DEBUG}
+      - USE_LOCAL_CA=${USE_LOCAL_CA}
+
     networks:
       services:
-        ipv4_address: 192.168.100.2
+        ipv4_address: ${NGINX_IPV4_ADDR}
     volumes:                                    # Storage can be either a
       - nginx_secrets:/etc/letsencrypt          # Docker managed volume (see list at the bottom)
-      # - ./user_conf.d:/etc/nginx/user_conf.d    # or a host mount with a relative or full path.
 
 volumes:
   nginx_secrets:
