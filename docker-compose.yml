@@ -23,7 +23,7 @@ services:
 
     networks:
       services:
-        ipv4_address: ${NGINX_IPV4_ADDR}
+        ipv4_address: ${NGINX_IPV4_ADDR:?error}
     volumes:                                    # Storage can be either a
       - nginx_secrets:/etc/letsencrypt          # Docker managed volume (see list at the bottom)
 
