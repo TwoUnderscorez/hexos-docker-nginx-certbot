@@ -7,19 +7,19 @@ services:
       context: ./src
     restart: unless-stopped
     environment:
-      - CERTBOT_EMAIL=${CERTBOT_EMAIL}
+      - CERTBOT_EMAIL=${CERTBOT_EMAIL:?error}
       # Optional (Defaults)
-      - DHPARAM_SIZE=${DHPARAM_SIZE}
-      - ELLIPTIC_CURVE=${ELLIPTIC_CURVE}
-      - RENEWAL_INTERVAL=${RENEWAL_INTERVAL}
-      - RSA_KEY_SIZE=${RSA_KEY_SIZE}
-      - STAGING=${STAGING}
-      - USE_ECDSA=${USE_ECDSA}
+      - DHPARAM_SIZE=${DHPARAM_SIZE:-2048}
+      - ELLIPTIC_CURVE=${ELLIPTIC_CURVE:-secp256r1}
+      - RENEWAL_INTERVAL=${RENEWAL_INTERVAL:-8d}
+      - RSA_KEY_SIZE=${RSA_KEY_SIZE:-2048}
+      - STAGING=${STAGING:-0}
+      - USE_ECDSA=${USE_ECDSA:-1}
       # Advanced (Defaults)
-      - CERTBOT_AUTHENTICATOR=${CERTBOT_AUTHENTICATOR}
+      - CERTBOT_AUTHENTICATOR=${CERTBOT_AUTHENTICATOR:-webroot}
       - CERTBOT_DNS_PROPAGATION_SECONDS=${CERTBOT_DNS_PROPAGATION_SECONDS}
-      - DEBUG=${DEBUG}
-      - USE_LOCAL_CA=${USE_LOCAL_CA}
+      - DEBUG=${DEBUG:-0}
+      - USE_LOCAL_CA=${USE_LOCAL_CA:-0}
 
     networks:
       services:
