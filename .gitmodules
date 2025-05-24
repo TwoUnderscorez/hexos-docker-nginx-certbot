@@ -1,0 +1,3 @@
+[submodule "naxsi"]
+	path = naxsi
+	url = git@github.com:wargio/naxsi.git
